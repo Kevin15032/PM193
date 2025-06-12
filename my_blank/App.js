@@ -12,7 +12,13 @@ const Texto =()=>{
   )
 }
 
-
+const Boton = () =>{
+  const[conteiner1,conteiner2]= useState('Boton');
+  const actulziarBoton = () => {conteiner2 ('Boton precionado')}
+  return(
+    <Button title={conteiner1} onPress={actulziarBoton}></Button>
+  )
+}
 // Zona 2: Main 
 export default function App() {
   return (
@@ -22,7 +28,7 @@ export default function App() {
       <Texto >Hola</Texto>
       <Texto >Mundo</Texto>
       <Texto >react native</Texto>
-      <Button title='Presionar'></Button>
+      <Boton></Boton>
       <StatusBar style="auto" />
 
     </View>
