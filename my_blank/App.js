@@ -1,37 +1,25 @@
 // Zona 1: Importaciones 
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Button } from 'react-native';
-import react, {useState} from'react';
-
-
-const Texto =({style})=>{
-  const[contenido,setContenido]= useState ('Hola mundo');
-  const actulizaTexto=() => {setContenido('Estado Modificado')}
-  return (
-    <Text style={[styles.Text,style]} onPress={actulizaTexto}>{contenido}</Text>
-  )
-}
-
-// const Boton = () =>{
-//   const[conteiner1,conteiner2]= useState('Boton');
-//   const actulziarBoton = () => {conteiner2 ('Boton precionado')}
-//   return(
-//     <Button title={conteiner1} onPress={actulziarBoton}></Button>
-//   )
-// }
-// Zona 2: Main 
+import { StyleSheet, Text, View, Button, Alert,ScrollView,TouchableOpacity,TouchableHighlight,TouchableNativeFeedback,Pressable,Switch} from 'react-native';
+import React, {useState} from'react';
+import { Button as ButonPaper, Provider as ProveedorPaper} from 'react-native-paper';
+import {Button as BotonElements} from 'react-native-elements';
+ 
 export default function App() {
-  return (
+   const [modoOscuro, setModoOscuro] = useState(false);
+   const alternarModoOscuro = () => setModoOscuro(previo => !previo);
+     return (
+    <ProveedorPaper>
+      <ScrollView contentContainerStyle={styles.ScrollContainer}>
+        <View style={[styles.container, {backgroundColor: modoOscuro ? '#111' : '#fff'}]}></View>
 
-    <View style={styles.container}>
-
-      <Texto style={styles.azul}></Texto>
-      <Texto style={styles.verde}></Texto>
-      <Texto style={styles.negro}></Texto>
-      {/* <Boton></Boton> */}
-      <StatusBar style="auto" />
-
-    </View>
+        <View style={styles.container}>
+          <Text style={styles.title}>Modo de pantalla: {modoOscuro ? 'Oscuro' : 'Claro'}</Text>
+          <Switch value = {modoOscuro} onValueChange={alternarModoOscuro} />
+        </View> 
+             
+      </ScrollView>
+      </ProveedorPaper>
 
   );
 }
@@ -41,18 +29,22 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'strech',
-    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 50,
+    
     
   },
-  Text:{
-    color:'white',
-    fontSize: 27
-  },
-  azul:{backgroundColor:'blue'},
-  verde:{backgroundColor:'green'},
-  negro:{backgroundColor:'black'}
-  
-  
+ title: {
+  fontSize: 16,
+  marginVertical: 6,
+  textAlign: 'center',
+  color: '#000'
+ },
+ section: {
+  marginVertical: 15,
+  alignItems: 'center',
+  width: '100%'
+ }
+ 
 });
