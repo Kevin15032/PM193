@@ -1,57 +1,84 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, TextInput, Text, Button, ScrollView, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import SplashScreen from './src/screens/SplashScreen';
-import HomeScreen from './src/screens/HomeScreen';
+import{
+  ScrollView, //hacer el deslizable
+  StatusBar, //barra de estado
+  StyleSheet, //estilos
+  Text, //texto
+} from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
-export default function App() {
- 
- const [isLoading, setIsLoading] = useState(true);
+const App = () => {
+ return (
+  <SafeAreaProvider>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView style={styles.scrollView} horizontal={true}>
+        <ScrollView>
+          <Text style={styles.text}>
+            Este es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades.     
+            ste es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades. 
+            ste es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades. 
+            ste es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades. 
+            ste es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades. 
+            ste es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades.  
+            ste es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades. 
+            ste es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades. 
+            ste es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades. 
+            ste es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+            Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+            Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+            Puedes personalizar los estilos según tus necesidades. 
+          </Text>
+        </ScrollView>
+      </ScrollView>
+      </SafeAreaView>
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2500); // 3 seconds
-
-    return () => clearTimeout(timer); // Cleanup the timer on unmount
-  }, []);
-
-  return (
-    <View style={{ flex: 1 }}>
-      <StatusBar hidden />
-      {isLoading ? (
-        <SplashScreen />
-      ) : (
-        <HomeScreen />
-      )}
-    </View>
+  </SafeAreaProvider>
   );
 }
 
+
+
+ //Definimos los estilos con StyleSheet
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    paddingBottom: 80,
+    flex: 1,                             // Ocupa todo el alto disponible de la pantalla
+    paddingTop: StatusBar.currentHeight // Evita que el contenido se solape con la barra de estado
   },
-  label: {
-    fontWeight: 'bold',
-    marginTop: 12,
-    marginBottom: 4,
-    color: '#333',
+  scrollView: {
+    backgroundColor: 'green',            // Fondo rosa para visualizar el área del ScrollView
   },
-  input: {
-    height: 40,
-    borderColor: '#aaa',
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-  errorInput: {
-    borderColor: 'red',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginBottom: 4,
+  text: {
+    fontSize: 42,                        // Texto grande
+    padding: 12,                         // Espaciado interno
   },
 });
+
+// Exportamos el componente para que pueda ser usado por la app
+export default App;
+
