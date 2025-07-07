@@ -1,106 +1,106 @@
-// ✅ Zona 1: Importaciones necesarias
-
-import React, { useState, useEffect } from 'react';
-
-// Importamos componentes principales desde React Native
+// ✅ Importaciones necesarias
+import React, { useEffect, useState } from 'react';
 import {
-  StatusBar,        // Controla la barra de estado (hora, señal, batería)
-  StyleSheet,       // Permite crear estilos personalizados
-  Text,             // Para mostrar texto
-  ScrollView,       // Vista desplazable vertical u horizontal
-  View              // Contenedor principal
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  ActivityIndicator,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
-
-// SafeArea: asegura que el contenido no se solape con elementos del sistema (notch, barra superior)
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-
-// Importamos pantallas personalizadas
-import SplashScreen from './src/screens/SplashScreen';
-import HomeScreen from './src/screens/HomeScreen';
 // ✅ Componente principal
+const App = () => {
 
-export default function App() {
-  // Estado para controlar si la app está en modo "cargando"
-  const [isLoading, setIsLoading] = useState(true);
+  // Estado para saber si está cargando o ya se descargaron los datos
+  const [loading, setLoading] = useState(true);
 
-  // Efecto que simula una pantalla de carga por 2.5 segundos
+  // Estado para guardar los usuarios descargados
+  const [users, setUsers] = useState([]);
+
+  // ✅ useEffect: se ejecuta una vez al montar el componente
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false); // Después de 2.5s cambia a HomeScreen
-    }, 2500);
-
-    return () => clearTimeout(timer); // Limpieza del temporizador
+    // Simulamos un tiempo de espera (2 segundos) antes de hacer fetch
+    setTimeout(() => {
+      fetch('https://jsonplaceholder.typicode.com/users') // API falsa para pruebas
+        .then(resp => resp.json())
+        .then(data => {
+          setUsers(data);      // Guardamos los usuarios
+          setLoading(false);   // Quitamos el indicador de carga
+        })
+        .catch(err => {
+          console.error('Error al cargar usuarios: ', err);
+          setLoading(false);   // Quitamos el loading si hay error
+        });
+    }, 2000);
   }, []);
-  // Si está cargando, mostramos la SplashScreen
-  if (isLoading) {
-    return (
-      <View style={{ flex: 1 }}>
-        <StatusBar hidden /> {/* Ocultamos barra superior durante la carga */}
-        <SplashScreen />
-      </View>
-    );
-  }
-
-  // Si ya cargó, mostramos el contenido principal
-  return (
-    <SafeAreaProvider>
-      {/* SafeAreaView protege el contenido de solaparse con la barra superior o bordes del sistema */}
-      <SafeAreaView style={styles.container} edges={['top']}>
-
-        {/* ScrollView externo (horizontal) */}
-        <ScrollView style={styles.scrollView} horizontal={true}>
-
-          {/* ScrollView interno (vertical) */}
-          <ScrollView>
-
-            {/* Texto largo que activa el desplazamiento vertical */}
-            <Text style={styles.text}>
-              {/* Texto repetido para provocar scroll */}
-              Este es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
-              Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
-              Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
-              Puedes personalizar los estilos según tus necesidades.
-
-              {"\n\n"} {/* Salto de línea */}
-              Repite varias veces para forzar scroll...
-
-              Este es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
-              Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
-              Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
-              Puedes personalizar los estilos según tus necesidades.
-
-              {"\n\n"}
-              Este es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
-              Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
-              Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
-              Puedes personalizar los estilos según tus necesidades.
-
-              {"\n\n"}
-              Y así sucesivamente...
-            </Text>
-
-          </ScrollView>
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+  // ✅ Render individual de cada usuario en la lista
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <Text style={styles.name}> {item.name} </Text>
+      <Text style={styles.text}> {item.email} </Text>
+      <Text style={styles.text}> {item.address.city} </Text>
+      <Text style={styles.text}> {item.company.name} </Text>
+    </View>
   );
-}
-// ✅ Zona de estilos
+  // ✅ Interfaz principal
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+
+      {/* Si está cargando, mostramos el ActivityIndicator */}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007bff" />
+          <Text style={styles.loadingText}>Cargando usuarios...</Text>
+        </View>
+      ) : (
+        // Si ya cargó, mostramos la lista
+        <FlatList
+          data={users}                           // Lista de usuarios
+          keyExtractor={item => item.id.toString()}  // Clave única para cada elemento
+          renderItem={renderItem}               // Qué renderizar por cada ítem
+          contentContainerStyle={styles.list}   // Estilo de la lista
+        />
+      )}
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,                           // Ocupa toda la pantalla
-    paddingTop: StatusBar.currentHeight || 0, // Evita que el contenido se superponga con la barra de estado
-    padding: 20,                       // Espaciado general
-    backgroundColor: '#f4f4f4',
+    flex: 1,                        // Ocupa todo el alto de la pantalla
+    paddingTop: StatusBar.currentHeight || 0,
+    padding: 16,
+    backgroundColor: '#fff',
   },
-  scrollView: {
-    backgroundColor: '#d0f0c0',        // Verde claro para mostrar visualmente el área desplazable
+  loadingContainer: {
+    flex: 1,                        // Centrar vertical
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: '#333',
+  },
+  list: {
+    paddingBottom: 20,
+  },
+  card: {
+    backgroundColor: '#f0f0f0',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 10,
+    elevation: 2, // sombra en Android
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   text: {
-    fontSize: 18,
-    padding: 16,
+    fontSize: 14,
     color: '#333',
-    lineHeight: 26,
+    marginTop: 2,
   },
 });
