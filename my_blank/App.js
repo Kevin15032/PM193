@@ -1,124 +1,123 @@
-// App.js
+// Importamos React y el hook useState para manejar el estado del modo oscuro
+import React, { useState } from 'react';
 
-// 1️⃣ Importaciones necesarias para construir la interfaz
-import React, { useState } from 'react'; // React y useState para manejar estados en componentes funcionales
-import { StyleSheet, Text, View, Button } from 'react-native'; // Componentes básicos de la UI
-import { StatusBar } from 'expo-status-bar'; // Control de la barra superior del sistema (hora, batería, etc.)
-// 2️⃣ Componente Texto
-// Muestra un texto en pantalla y lo cambia al presionarlo.
-// Acepta un estilo adicional mediante la prop 'style'.
+// Importamos componentes básicos de React Native
+import {
+  StyleSheet,      // Para crear estilos
+  Text,            // Para mostrar texto en pantalla
+  View,            // Contenedor similar a <div>
+  ScrollView,      // Vista con desplazamiento vertical
+  StatusBar,       // Barra de estado del sistema (hora, batería, etc.)
+  Switch           // Interruptor para activar/desactivar el modo oscuro
+} from 'react-native';
 
+// Importamos ProveedorPaper desde react-native-paper
+// Esto permite que los componentes de esa librería funcionen correctamente (aunque en este ejemplo no se usan visualmente, es buena práctica mantenerlo si luego agregas botones o inputs de react-native-paper)
+import { Provider as ProveedorPaper } from 'react-native-paper';
+// COMPONENTE: Texto
+// Este componente muestra un texto que se puede presionar. Al hacerlo, cambia su contenido.
+// Además, permite recibir estilos externos para aplicar colores de fondo (azul, verde, negro).
 const Texto = ({ style }) => {
-  // Estado que guarda el contenido del texto. Inicialmente muestra 'Hola mundo'.
+  // Estado que almacena el texto que se va a mostrar. Inicia con "Hola mundo".
   const [contenido, setContenido] = useState('Hola mundo');
 
-  // Función que se ejecuta cuando se presiona el texto. Actualiza el estado.
+  // Función que actualiza el contenido al presionar el texto
   const actulizaTexto = () => {
     setContenido('Estado Modificado');
   };
 
   return (
-    // El estilo final es una combinación del estilo base + el que se reciba como prop desde el padre.
-    // El evento onPress permite que el <Text /> sea interactivo.
+    // Componente <Text> que cambia su valor al presionarlo (onPress)
+    // style={[...]} permite aplicar varios estilos (el base + el que venga como prop)
     <Text style={[styles.Text, style]} onPress={actulizaTexto}>
       {contenido}
     </Text>
   );
 };
-
-/*
-🧠 Detalles importantes:
-- style={[styles.Text, style]}: aplica múltiples estilos. El segundo (style) puede sobrescribir el primero.
-- onPress: convierte el texto en un componente táctil.
-- Esto permite usar <Texto style={styles.azul} /> para cambiar su fondo dinámicamente.
-*/
-// 3️⃣ Componente Boton
-// Muestra un botón cuyo título cambia al presionarlo.
-
-const Boton = () => {
-  // Estado que controla el texto del botón.
-  const [conteiner1, conteiner2] = useState('Botón');
-
-  // Función que cambia el título cuando el botón es presionado.
-  const actulziarBoton = () => {
-    conteiner2('Botón presionado');
-  };
-
-  return (
-    // <Button /> recibe su título del estado actual y ejecuta la función cuando se presiona.
-    <Button title={conteiner1} onPress={actulziarBoton} />
-  );
-};
-
-/*
-🧠 Detalles:
-- Button es un componente simple, sin posibilidad de aplicar estilos directamente.
-- Ideal para acciones rápidas como enviar formularios o cambiar textos.
-*/
-// 4️⃣ Componente principal App
-// Aquí se organizan y muestran todos los componentes creados anteriormente.
-
+// COMPONENTE PRINCIPAL: App
+// Este componente contiene toda la lógica y estructura de la pantalla principal.
 export default function App() {
+  // Estado booleano para controlar si está activado el modo oscuro
+  const [modoOscuro, setModoOscuro] = useState(false);
+
+  // Función que alterna el valor de modoOscuro (true <-> false)
+  const alternarModoOscuro = () => setModoOscuro(previo => !previo);
+
   return (
-    // View actúa como el contenedor general de toda la pantalla.
-    <View style={styles.container}>
+    // Proveedor general de estilos de React Native Paper (obligatorio si usas componentes de esa librería)
+    <ProveedorPaper>
 
-      {/* Tres textos con estilo base y comportamiento interactivo */}
-      <Texto />
-      <Texto />
-      <Texto />
+      {/* ScrollView permite que el contenido sea desplazable si crece mucho */}
+      <ScrollView contentContainerStyle={styles.ScrollContainer}>
 
-      {/* Botón con comportamiento dinámico */}
-      <Boton />
+        {/* Contenedor principal con color de fondo dinámico:
+            - Si modoOscuro está activado, fondo oscuro '#111'
+            - Si no, fondo claro '#fff' */}
+        <View style={[styles.container, { backgroundColor: modoOscuro ? '#111' : '#fff' }]}>
 
-      {/* Tres textos con estilos personalizados de fondo */}
-      <Texto style={styles.azul} />
-      <Texto style={styles.verde} />
-      <Texto style={styles.negro} />
+          {/* Texto que muestra si estás en modo claro u oscuro */}
+          <Text style={[styles.title, { color: modoOscuro ? '#fff' : '#000' }]}>
+            Modo de pantalla: {modoOscuro ? 'Oscuro' : 'Claro'}
+          </Text>
 
-      {/* Barra de estado (Expo) */}
-      <StatusBar style="auto" />
-    </View>
+          {/* Switch permite cambiar entre modo claro y oscuro */}
+          <Switch value={modoOscuro} onValueChange={alternarModoOscuro} />
+
+          {/* Componente de texto reutilizable con diferentes colores de fondo */}
+          <Texto style={styles.azul} />
+          <Texto style={styles.verde} />
+          <Texto style={styles.negro} />
+        </View>
+
+        {/* Barra de estado del dispositivo */}
+        <StatusBar style="auto" />
+
+      </ScrollView>
+    </ProveedorPaper>
   );
 }
-
-/*
-🧠 Detalles de View:
-- style={styles.container} aplica estilos de flexbox.
-- Alineación vertical y horizontal definida en el StyleSheet.
-- Los componentes hijos se renderizan en el orden que aparecen.
-*/
-// 5️⃣ Estilos con StyleSheet
-// Define estilos reutilizables usando nombres clave.
+// ESTILOS DEFINIDOS CON StyleSheet
 
 const styles = StyleSheet.create({
+  // Contenedor principal de la pantalla
   container: {
-    flex: 1,                      // El View ocupa toda la altura de la pantalla
-    backgroundColor: '#fff',      // Fondo blanco
-    alignItems: 'stretch',        // Estira los hijos horizontalmente (ancho máximo)
-    justifyContent: 'center',     // Centra los hijos verticalmente
+    flex: 1, // Ocupa todo el alto de la pantalla
+    alignItems: 'center', // Centra los elementos horizontalmente
+    justifyContent: 'center', // Centra los elementos verticalmente
+    paddingHorizontal: 16, // Espacio lateral interno
+    paddingBottom: 50 // Espacio inferior
   },
+
+  // Estilo base del texto
   Text: {
-    color: 'white',               // Color del texto
-    fontSize: 27,                 // Tamaño grande para destacar
-    padding: 10,                  // Espaciado interno para que no quede pegado a los bordes
-    textAlign: 'center',          // Centra horizontalmente el texto
+    color: 'white', // Color de texto blanco
+    fontSize: 27,   // Texto grande
+    textAlign: 'center', // Centrado horizontal
+    marginVertical: 10,  // Espaciado arriba y abajo
+    padding: 10          // Espaciado interno
   },
+
+  // Estilo para cada fondo de color
   azul: {
-    backgroundColor: 'blue'       // Fondo azul (se combina con Text)
+    backgroundColor: 'blue' // Fondo azul
   },
   verde: {
-    backgroundColor: 'green'      // Fondo verde
+    backgroundColor: 'green' // Fondo verde
   },
   negro: {
-    backgroundColor: 'black'      // Fondo negro
+    backgroundColor: 'black' // Fondo negro
+  },
+
+  // Estilo para el título "Modo de pantalla: Oscuro/Claro"
+  title: {
+    fontSize: 16,
+    marginVertical: 6,
+    textAlign: 'center'
+    // El color se modifica desde el componente App usando ternario
+  },
+
+  // Estilo para el contenedor del ScrollView
+  ScrollContainer: {
+    paddingVertical: 20 // Espacio vertical general del contenido scrollable
   }
 });
-
-/*
-🧠 Detalles:
-- StyleSheet.create() mejora el rendimiento en dispositivos móviles.
-- Puedes combinar estilos con style={[styles.Text, styles.azul]}
-- Propiedades más comunes: color, fontSize, padding, margin, backgroundColor, textAlign
-- Propiedades de flexbox: flex, justifyContent, alignItems, flexDirection
-*/
