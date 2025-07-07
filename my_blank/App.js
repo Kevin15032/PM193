@@ -1,194 +1,283 @@
-// 🔹 Zona 1: Importaciones
-// Importamos React y useState para manejar estados
+// ✅ Zona 1: IMPORTACIONES
+
+// React y el hook useState para controlar los valores ingresados y estados internos
 import React, { useState } from 'react';
 
-// Importamos componentes nativos de React Native
+// Componentes principales de React Native
 import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  StatusBar,
-  Switch,
-  Button,
-  Alert,
-  TouchableOpacity,
-  TouchableHighlight,
-  TouchableWithoutFeedback,
-  Pressable
+  StyleSheet,        // Para crear estilos
+  Text,              // Mostrar texto en pantalla
+  View,              // Contenedor de elementos
+  ScrollView,        // Hacer scroll si hay muchos elementos
+  StatusBar,         // Barra de estado del sistema
+  TextInput,         // Campos de entrada
+  Button,            // Botones nativos
+  Switch,            // Interruptor tipo ON/OFF
+  Alert              // Para mostrar ventanas emergentes
 } from 'react-native';
 
-// Importamos botones personalizados desde librerías externas
+// Botón y proveedor visual de la librería react-native-paper (estética moderna)
 import { Provider as ProveedorPaper, Button as ButtonPaper } from 'react-native-paper';
-import { Button as ButtonElements } from 'react-native-elements';
 
-// 🔹 Zona 2: Componente principal App
+// Botón de la librería react-native-elements (personalización e iconos)
+import { Button as ButtonElements } from 'react-native-elements';
+// ✅ Zona 2: COMPONENTE PRINCIPAL
 
 export default function App() {
-  // Estado que controla si el modo oscuro está activado o no
+  // 🔁 Estado para controlar el modo oscuro (ON/OFF)
   const [modoOscuro, setModoOscuro] = useState(false);
 
-  // Función para alternar entre modo oscuro y claro
+  // 🔄 Función que invierte el valor de modoOscuro (true/false)
   const alternarModoOscuro = () => setModoOscuro(previo => !previo);
+
+  // 🧠 Estados para cada campo de entrada
+  const [emailText, setEmailText] = useState('');
+  const [defaultText, onChangeDefault] = useState('');
+  const [numberPadText, setNumberPadText] = useState('');
+  const [decimalPadText, setDecimalPadText] = useState('');
+  const [numericText, setNumericText] = useState('');
+  const [phoneText, setPhoneText] = useState('');
+  const [urlText, setUrlText] = useState('');
+  const [visiblePassword, setVisiblePassword] = useState('');
+  // ✅ VALIDACIONES USANDO REGEX (expresiones regulares)
+
+  // Valida si el texto es un correo electrónico válido
+  const isValidEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  // Valida si el texto es un número de teléfono entre 7 y 15 dígitos
+  const isValidPhone = (phone) =>
+    /^[0-9]{7,15}$/.test(phone);
+
+  // Valida si el texto es una URL válida
+  const isValidUrl = (url) =>
+    /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6})(\/[\w.-]*)*\/?$/.test(url);
+
+  // Valida si el texto solo contiene números enteros
+  const isNumeric = (value) =>
+    /^[0-9]+$/.test(value);
+
+  // Valida si el texto contiene números decimales
+  const isDecimal = (value) =>
+    /^[0-9]*\.?[0-9]+$/.test(value);
+  // ✅ FUNCIONES DE ALERTA
+
+  // Alerta simple con un mensaje
+  const AlertaBasica = () => {
+    Alert.alert('Alerta Básica', '¡Hola, este es un mensaje de alerta!');
+  };
+
+  // Alerta con botones de confirmación
+  const AlertaConfirmacion = () => {
+    Alert.alert(
+      '¿Gus es Gustavo?',
+      'Confirma tu respuesta',
+      [
+        { text: 'No', onPress: () => Alert.alert('No es cierto') },
+        { text: 'Sí', onPress: () => Alert.alert('Exactamente') }
+      ]
+    );
+  };
+
+  // Alerta con entrada de texto (solo en iOS funciona `Alert.prompt`)
+  const AlertTexto = () => {
+    Alert.prompt(
+      '¿Erick está aquí?',
+      'Escribe tu respuesta',
+      text => Alert.alert('Exactamente, ' + text)
+    );
+  };
+
+  // Alerta que evalúa un valor ingresado (edad)
+  const AlertCondicional = () => {
+    Alert.prompt('¿Qué edad tienes?', '', input => {
+      const edad = parseInt(input);
+      if (edad >= 1 && edad <= 70) {
+        Alert.alert('Tu edad es: ' + edad);
+      } else {
+        Alert.alert('Edad no válida');
+      }
+    });
+  };
+
+  // Alerta que aparece después de 5 segundos
+  const alertaTiempo = () => {
+    setTimeout(() => {
+      Alert.alert('Alerta después de 5 segundos');
+    }, 5000);
+  };
+  // ✅ RENDERIZADO DE LA INTERFAZ
 
   return (
     <ProveedorPaper>
-      {/* ScrollView permite desplazar los elementos si hay muchos botones */}
-      <ScrollView contentContainerStyle={styles.ScrollContainer}>
+      {/* ScrollView permite desplazarse si el contenido excede la pantalla */}
+      <ScrollView contentContainerStyle={styles.container}>
 
-        {/* Contenedor con fondo dinámico según modoOscuro */}
-        <View style={[styles.container, { backgroundColor: modoOscuro ? '#111' : '#fff' }]}>
+        {/* 🔘 SWITCH DE MODO OSCURO */}
+        <View style={[styles.section, { backgroundColor: modoOscuro ? '#111' : '#fff' }]}>
           <Text style={[styles.title, { color: modoOscuro ? '#fff' : '#000' }]}>
             Modo de pantalla: {modoOscuro ? 'Oscuro' : 'Claro'}
           </Text>
-
-          {/* Switch que activa o desactiva el modo oscuro */}
           <Switch value={modoOscuro} onValueChange={alternarModoOscuro} />
         </View>
+        {/* 🧾 CAMPOS DE TEXTO */}
 
-        {/* 🔘 Botón 1: Botón nativo */}
-        <View style={styles.section}>
-          <Text style={styles.title}>1. Botón Nativo</Text>
-          <Button
-            title="Botón Nativo"
-            color="#007bff"
-            onPress={() => Alert.alert('Botón Nativo Presionado')}
-          />
-        </View>
+        {/* Campo de correo electrónico con validación */}
+        <Text style={styles.label}>Correo electrónico:</Text>
+        <TextInput
+          style={[
+            styles.input,
+            !isValidEmail(emailText) && emailText ? styles.errorInput : null
+          ]}
+          placeholder="ejemplo@correo.com"
+          value={emailText}
+          onChangeText={setEmailText}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        {!isValidEmail(emailText) && emailText !== '' && (
+          <Text style={styles.errorText}>Correo inválido</Text>
+        )}
 
-        {/* 🔘 Botón 2: TouchableOpacity */}
-        <View style={styles.section}>
-          <Text style={styles.title}>2. TouchableOpacity</Text>
-          <TouchableOpacity
-            style={[styles.btn, { backgroundColor: '#28a745' }]}
-            onPress={() => Alert.alert('TouchableOpacity')}
-          >
-            <Text style={styles.btnText}>TouchableOpacity</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Campo default (texto libre) */}
+        <Text style={styles.label}>Texto libre:</Text>
+        <TextInput
+          style={styles.input}
+          value={defaultText}
+          onChangeText={onChangeDefault}
+          placeholder="Escribe texto"
+          keyboardType="default"
+        />
 
-        {/* 🔘 Botón 3: TouchableHighlight */}
-        <View style={styles.section}>
-          <Text style={styles.title}>3. TouchableHighlight</Text>
-          <TouchableHighlight
-            style={[styles.btn, { backgroundColor: '#ffc107' }]}
-            underlayColor="#e0a800"
-            onPress={() => Alert.alert('Botón 3')}
-          >
-            <Text style={styles.btnText}>TouchableHighlight</Text>
-          </TouchableHighlight>
-        </View>
+        {/* Campo numérico (solo números enteros) */}
+        <Text style={styles.label}>Solo números (number-pad):</Text>
+        <TextInput
+          style={styles.input}
+          value={numberPadText}
+          onChangeText={text => {
+            if (isNumeric(text) || text === '') setNumberPadText(text);
+          }}
+          keyboardType="number-pad"
+        />
 
-        {/* 🔘 Botón 4: TouchableWithoutFeedback */}
-        <View style={styles.section}>
-          <Text style={styles.title}>4. Sin Retroalimentación Visual</Text>
-          <TouchableWithoutFeedback onPress={() => Alert.alert('¡Sin retroalimentación visual!')}>
-            <View style={[styles.btn, { backgroundColor: '#17a2b8' }]}>
-              <Text style={styles.btnText}>Sin retroalimentación</Text>
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
+        {/* Campo decimal */}
+        <Text style={styles.label}>Números decimales (decimal-pad):</Text>
+        <TextInput
+          style={styles.input}
+          value={decimalPadText}
+          onChangeText={text => {
+            if (isDecimal(text) || text === '') setDecimalPadText(text);
+          }}
+          keyboardType="decimal-pad"
+        />
 
-        {/* 🔘 Botón 5: Pressable */}
-        <View style={styles.section}>
-          <Text style={styles.title}>5. Pressable (Presionado)</Text>
-          <Pressable
-            style={({ pressed }) => [
-              styles.btn,
-              { backgroundColor: pressed ? '#6c757d' : '#343a40' },
-            ]}
-            onPress={() => Alert.alert('¡Presionaste Pressable!')}
-          >
-            <Text style={styles.btnText}>Pressable</Text>
-          </Pressable>
-        </View>
+        {/* Campo numérico general */}
+        <Text style={styles.label}>Números (numeric):</Text>
+        <TextInput
+          style={styles.input}
+          value={numericText}
+          onChangeText={text => {
+            if (isNumeric(text) || text === '') setNumericText(text);
+          }}
+          keyboardType="numeric"
+        />
 
-        {/* 🔘 Botón 6: Button de React Native Paper */}
-        <View style={styles.section}>
-          <Text style={styles.title}>6. Botón de Paper</Text>
-          <ButtonPaper
-            mode="contained"
-            buttonColor="#9c27b0"
-            textColor="#fff"
-            onPress={() => Alert.alert('¡Presionaste el botón de Paper!')}
-            style={styles.paperButton}
-          >
-            Botón de Papel
-          </ButtonPaper>
-        </View>
+        {/* Teléfono con validación */}
+        <Text style={styles.label}>Teléfono:</Text>
+        <TextInput
+          style={[
+            styles.input,
+            !isValidPhone(phoneText) && phoneText ? styles.errorInput : null
+          ]}
+          value={phoneText}
+          onChangeText={setPhoneText}
+          placeholder="Ej: 5533221144"
+          keyboardType="phone-pad"
+        />
+        {!isValidPhone(phoneText) && phoneText !== '' && (
+          <Text style={styles.errorText}>Teléfono inválido</Text>
+        )}
 
-        {/* 🔘 Botón 7: Button de React Native Elements */}
-        <View style={styles.section}>
-          <Text style={styles.title}>7. Botón de Elements</Text>
-          <ButtonElements
-            title="Botón Elements"
-            onPress={() => Alert.alert('¡Presionaste el botón de Elements!')}
-            buttonStyle={{
-              backgroundColor: '#ff5722',
-              borderRadius: 10,
-              padding: 10,
-            }}
-            titleStyle={{ fontWeight: 'bold', fontSize: 16 }}
-          />
-        </View>
+        {/* URL con validación */}
+        <Text style={styles.label}>URL:</Text>
+        <TextInput
+          style={[
+            styles.input,
+            !isValidUrl(urlText) && urlText ? styles.errorInput : null
+          ]}
+          value={urlText}
+          onChangeText={setUrlText}
+          placeholder="https://misitio.com"
+          keyboardType="url"
+          autoCapitalize="none"
+        />
+        {!isValidUrl(urlText) && urlText !== '' && (
+          <Text style={styles.errorText}>URL inválida</Text>
+        )}
 
-        {/* Barra de estado superior */}
+        {/* Contraseña visible */}
+        <Text style={styles.label}>Contraseña (visible):</Text>
+        <TextInput
+          style={styles.input}
+          value={visiblePassword}
+          onChangeText={setVisiblePassword}
+          placeholder="Contraseña"
+          keyboardType="visible-password"
+          secureTextEntry={false}
+          autoCapitalize="none"
+        />
+        {/* ✅ BOTONES PARA ALERTAS */}
+        <Button title="Alerta Básica" onPress={AlertaBasica} />
+        <Button title="Alerta de Confirmación" onPress={AlertaConfirmacion} />
+        <Button title="Alerta con Texto" onPress={AlertTexto} />
+        <Button title="Alerta Condicional (edad)" onPress={AlertCondicional} />
+        <Button title="Alerta con tiempo (5s)" onPress={alertaTiempo} />
+
         <StatusBar style="auto" />
       </ScrollView>
     </ProveedorPaper>
   );
 }
-// 🔹 Zona 3: Estilos con StyleSheet
+// ✅ Zona 3: ESTILOS
 
 const styles = StyleSheet.create({
-  // Contenedor base
   container: {
-    flex: 1,
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingBottom: 50,
+    flexGrow: 1,             // Permite que ScrollView se expanda
+    padding: 20,             // Espacio interno general
+    backgroundColor: '#f4f4f4',
   },
-
-  // Estilo general para el título
-  title: {
-    fontSize: 16,
-    marginVertical: 6,
-    textAlign: 'center',
-    color: '#000',
-  },
-
-  // Contenedor de cada sección (título + botón)
   section: {
-    marginVertical: 15,
+    marginBottom: 20,
+    padding: 20,
     alignItems: 'center',
-    width: '100%',
+    borderRadius: 10,
   },
-
-  // Estilo base para botones personalizados
-  btn: {
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 5,
-    width: 220,
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
-
-  // Estilo del texto dentro de los botones personalizados
-  btnText: {
-    color: '#fff',
-    fontSize: 16,
-    textAlign: 'center',
+  label: {
+    fontWeight: 'bold',
+    marginTop: 12,
+    marginBottom: 4,
+    color: '#333',
   },
-
-  // Estilo del botón de Paper
-  paperButton: {
-    marginTop: 5,
-    width: 220,
+  input: {
+    height: 40,
+    borderColor: '#aaa',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 6,
+    backgroundColor: '#fff',
   },
-
-  // Contenedor para scroll
-  ScrollContainer: {
-    paddingVertical: 20,
-    alignItems: 'center',
+  errorInput: {
+    borderColor: 'red',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 6,
   },
 });
-
