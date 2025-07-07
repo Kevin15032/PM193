@@ -1,174 +1,106 @@
-// ✅ Zona 1: IMPORTACIONES NECESARIAS
+// ✅ Zona 1: Importaciones necesarias
 
-// React y useState para manejar valores de campos y switches
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Componentes principales de la interfaz de usuario
+// Importamos componentes principales desde React Native
 import {
-  StatusBar,              // Controla el estilo de la barra de estado del sistema
-  StyleSheet,             // Para definir estilos personalizados
-  Text,                   // Para mostrar texto
-  View,                   // Contenedor flexible de elementos
-  TextInput,              // Campo de entrada de texto
-  Switch,                 // Componente de activación tipo ON/OFF
-  Alert,                  // Para mostrar alertas emergentes
-  Image,                  // Para mostrar imágenes estáticas
-  TouchableOpacity,       // Componente que responde al toque con opacidad
-  ImageBackground,        // Imagen de fondo que envuelve todo el contenido
-  ScrollView              // Permite hacer scroll si el contenido es largo
+  StatusBar,        // Controla la barra de estado (hora, señal, batería)
+  StyleSheet,       // Permite crear estilos personalizados
+  Text,             // Para mostrar texto
+  ScrollView,       // Vista desplazable vertical u horizontal
+  View              // Contenedor principal
 } from 'react-native';
 
-// Carga de imágenes locales
-const logo = require('./assets/logo.jpeg');        // Imagen de logo que se muestra arriba
-const background = require('./assets/fondo1.jpeg'); // Imagen que se usa como fondo de pantalla
-// ✅ COMPONENTE PRINCIPAL
+// SafeArea: asegura que el contenido no se solape con elementos del sistema (notch, barra superior)
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
+// Importamos pantallas personalizadas
+import SplashScreen from './src/screens/SplashScreen';
+import HomeScreen from './src/screens/HomeScreen';
+// ✅ Componente principal
 
 export default function App() {
-  // 🎯 Estados controlados con useState
-  const [nombre, setNombre] = useState('');               // Guarda el nombre ingresado
-  const [correo, setCorreo] = useState('');               // Guarda el correo ingresado
-  const [aceptarTerminos, setAceptarTerminos] = useState(false); // Switch ON/OFF para aceptar términos
+  // Estado para controlar si la app está en modo "cargando"
+  const [isLoading, setIsLoading] = useState(true);
 
-  // ✅ VALIDACIÓN DE FORMATO DE CORREO USANDO REGEX
-  const isValidEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); // RegEx que valida el formato correcto de email
-  // 🔔 FUNCIÓN QUE SE EJECUTA AL PRESIONAR "Registrarse"
-  const handleRegistro = () => {
-    // Valida que los campos no estén vacíos
-    if (nombre === '' || correo === '') {
-      Alert.alert('Error', 'No puede haber campos vacíos');
-      return;
-    }
+  // Efecto que simula una pantalla de carga por 2.5 segundos
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false); // Después de 2.5s cambia a HomeScreen
+    }, 2500);
 
-    // Valida que el correo tenga un formato válido
-    if (!isValidEmail(correo)) {
-      Alert.alert('Error', 'Correo electrónico inválido');
-      return;
-    }
+    return () => clearTimeout(timer); // Limpieza del temporizador
+  }, []);
+  // Si está cargando, mostramos la SplashScreen
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1 }}>
+        <StatusBar hidden /> {/* Ocultamos barra superior durante la carga */}
+        <SplashScreen />
+      </View>
+    );
+  }
 
-    // Valida que el usuario haya aceptado los términos
-    if (!aceptarTerminos) {
-      Alert.alert('Error', 'Debes aceptar los términos y condiciones');
-      return;
-    }
-
-    // Si todo está correcto, muestra mensaje de éxito
-    Alert.alert('Registro exitoso', `Nombre: ${nombre}\nCorreo: ${correo}`);
-  };
-  // ✅ RETORNO DE LA INTERFAZ
+  // Si ya cargó, mostramos el contenido principal
   return (
-    // Componente de fondo con imagen
-    <ImageBackground source={background} style={styles.background}>
-      
-      {/* Contenedor scrollable para evitar desbordamientos */}
-      <ScrollView contentContainerStyle={styles.container}>
-        
-        {/* Imagen del logo superior */}
-        <Image source={logo} style={styles.logo} />
+    <SafeAreaProvider>
+      {/* SafeAreaView protege el contenido de solaparse con la barra superior o bordes del sistema */}
+      <SafeAreaView style={styles.container} edges={['top']}>
 
-        {/* Campo de entrada para el nombre */}
-        <Text style={styles.label}>Nombre:</Text>
-        <TextInput
-          style={styles.Input}
-          placeholder='Ingresa nombre'
-          value={nombre}
-          onChangeText={setNombre}
-        />
+        {/* ScrollView externo (horizontal) */}
+        <ScrollView style={styles.scrollView} horizontal={true}>
 
-        {/* Campo de entrada para correo */}
-        <Text style={styles.label}>Correo Electrónico:</Text>
-        <TextInput
-          style={styles.Input}
-          placeholder='Ingresa correo'
-          value={correo}
-          onChangeText={setCorreo}
-        />
+          {/* ScrollView interno (vertical) */}
+          <ScrollView>
 
-        {/* Switch de aceptación de términos */}
-        <View style={styles.SwitchContainer}>
-          <Switch value={aceptarTerminos} onValueChange={setAceptarTerminos} />
-          <Text style={styles.switchLabel}>Acepto los términos y condiciones</Text>
-        </View>
+            {/* Texto largo que activa el desplazamiento vertical */}
+            <Text style={styles.text}>
+              {/* Texto repetido para provocar scroll */}
+              Este es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+              Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+              Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+              Puedes personalizar los estilos según tus necesidades.
 
-        {/* Botón de registro */}
-        <TouchableOpacity style={styles.button} onPress={handleRegistro}>
-          <Text style={styles.buttonText}>Registrarse</Text>
-        </TouchableOpacity>
+              {"\n\n"} {/* Salto de línea */}
+              Repite varias veces para forzar scroll...
 
-        {/* Barra de estado superior */}
-        <StatusBar style="auto" />
-      </ScrollView>
-    </ImageBackground>
+              Este es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+              Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+              Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+              Puedes personalizar los estilos según tus necesidades.
+
+              {"\n\n"}
+              Este es un ejemplo de una aplicación React Native con SafeAreaView y ScrollView.
+              Puedes agregar más contenido aquí para ver cómo funciona el desplazamiento.
+              Asegúrate de que el contenido sea lo suficientemente largo para activar el desplazamiento.
+              Puedes personalizar los estilos según tus necesidades.
+
+              {"\n\n"}
+              Y así sucesivamente...
+            </Text>
+
+          </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
+// ✅ Zona de estilos
+
 const styles = StyleSheet.create({
-  // Estilo de fondo con imagen que cubre toda la pantalla
-  background: {
-    flex: 1,
-    resizeMode: 'cover', // Ajusta imagen al tamaño
-  },
-
-  // Estilo del contenedor principal
   container: {
-    flexGrow: 1,
-    alignItems: 'center',         // Centra horizontalmente
-    justifyContent: 'center',     // Centra verticalmente
-    paddingVertical: 40,          // Espaciado superior e inferior
+    flex: 1,                           // Ocupa toda la pantalla
+    paddingTop: StatusBar.currentHeight || 0, // Evita que el contenido se superponga con la barra de estado
+    padding: 20,                       // Espaciado general
+    backgroundColor: '#f4f4f4',
   },
-
-  // Estilo de la imagen del logo
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
+  scrollView: {
+    backgroundColor: '#d0f0c0',        // Verde claro para mostrar visualmente el área desplazable
   },
-
-  // Estilo del texto de las etiquetas (Nombre, Correo, etc.)
-  label: {
+  text: {
     fontSize: 18,
-    marginBottom: 10,
-    color: '#fff',
-  },
-
-  // Estilo del campo de texto
-  Input: {
-    width: '80%',
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    backgroundColor: '#fff',
-  },
-
-  // Contenedor del switch y su texto
-  SwitchContainer: {
-    flexDirection: 'row',         // Elementos en fila
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-
-  // Estilo del texto al lado del switch
-  switchLabel: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#fff',
-  },
-
-  // Estilo del botón de registro
-  button: {
-    backgroundColor: '#007BFF',   // Azul brillante
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    width: '80%',
-    marginBottom: 20,
-  },
-
-  // Texto dentro del botón
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
+    padding: 16,
+    color: '#333',
+    lineHeight: 26,
   },
 });
