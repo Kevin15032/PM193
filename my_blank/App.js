@@ -1,123 +1,194 @@
-// Importamos React y el hook useState para manejar el estado del modo oscuro
+// 🔹 Zona 1: Importaciones
+// Importamos React y useState para manejar estados
 import React, { useState } from 'react';
 
-// Importamos componentes básicos de React Native
+// Importamos componentes nativos de React Native
 import {
-  StyleSheet,      // Para crear estilos
-  Text,            // Para mostrar texto en pantalla
-  View,            // Contenedor similar a <div>
-  ScrollView,      // Vista con desplazamiento vertical
-  StatusBar,       // Barra de estado del sistema (hora, batería, etc.)
-  Switch           // Interruptor para activar/desactivar el modo oscuro
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  StatusBar,
+  Switch,
+  Button,
+  Alert,
+  TouchableOpacity,
+  TouchableHighlight,
+  TouchableWithoutFeedback,
+  Pressable
 } from 'react-native';
 
-// Importamos ProveedorPaper desde react-native-paper
-// Esto permite que los componentes de esa librería funcionen correctamente (aunque en este ejemplo no se usan visualmente, es buena práctica mantenerlo si luego agregas botones o inputs de react-native-paper)
-import { Provider as ProveedorPaper } from 'react-native-paper';
-// COMPONENTE: Texto
-// Este componente muestra un texto que se puede presionar. Al hacerlo, cambia su contenido.
-// Además, permite recibir estilos externos para aplicar colores de fondo (azul, verde, negro).
-const Texto = ({ style }) => {
-  // Estado que almacena el texto que se va a mostrar. Inicia con "Hola mundo".
-  const [contenido, setContenido] = useState('Hola mundo');
+// Importamos botones personalizados desde librerías externas
+import { Provider as ProveedorPaper, Button as ButtonPaper } from 'react-native-paper';
+import { Button as ButtonElements } from 'react-native-elements';
 
-  // Función que actualiza el contenido al presionar el texto
-  const actulizaTexto = () => {
-    setContenido('Estado Modificado');
-  };
+// 🔹 Zona 2: Componente principal App
 
-  return (
-    // Componente <Text> que cambia su valor al presionarlo (onPress)
-    // style={[...]} permite aplicar varios estilos (el base + el que venga como prop)
-    <Text style={[styles.Text, style]} onPress={actulizaTexto}>
-      {contenido}
-    </Text>
-  );
-};
-// COMPONENTE PRINCIPAL: App
-// Este componente contiene toda la lógica y estructura de la pantalla principal.
 export default function App() {
-  // Estado booleano para controlar si está activado el modo oscuro
+  // Estado que controla si el modo oscuro está activado o no
   const [modoOscuro, setModoOscuro] = useState(false);
 
-  // Función que alterna el valor de modoOscuro (true <-> false)
+  // Función para alternar entre modo oscuro y claro
   const alternarModoOscuro = () => setModoOscuro(previo => !previo);
 
   return (
-    // Proveedor general de estilos de React Native Paper (obligatorio si usas componentes de esa librería)
     <ProveedorPaper>
-
-      {/* ScrollView permite que el contenido sea desplazable si crece mucho */}
+      {/* ScrollView permite desplazar los elementos si hay muchos botones */}
       <ScrollView contentContainerStyle={styles.ScrollContainer}>
 
-        {/* Contenedor principal con color de fondo dinámico:
-            - Si modoOscuro está activado, fondo oscuro '#111'
-            - Si no, fondo claro '#fff' */}
+        {/* Contenedor con fondo dinámico según modoOscuro */}
         <View style={[styles.container, { backgroundColor: modoOscuro ? '#111' : '#fff' }]}>
-
-          {/* Texto que muestra si estás en modo claro u oscuro */}
           <Text style={[styles.title, { color: modoOscuro ? '#fff' : '#000' }]}>
             Modo de pantalla: {modoOscuro ? 'Oscuro' : 'Claro'}
           </Text>
 
-          {/* Switch permite cambiar entre modo claro y oscuro */}
+          {/* Switch que activa o desactiva el modo oscuro */}
           <Switch value={modoOscuro} onValueChange={alternarModoOscuro} />
-
-          {/* Componente de texto reutilizable con diferentes colores de fondo */}
-          <Texto style={styles.azul} />
-          <Texto style={styles.verde} />
-          <Texto style={styles.negro} />
         </View>
 
-        {/* Barra de estado del dispositivo */}
-        <StatusBar style="auto" />
+        {/* 🔘 Botón 1: Botón nativo */}
+        <View style={styles.section}>
+          <Text style={styles.title}>1. Botón Nativo</Text>
+          <Button
+            title="Botón Nativo"
+            color="#007bff"
+            onPress={() => Alert.alert('Botón Nativo Presionado')}
+          />
+        </View>
 
+        {/* 🔘 Botón 2: TouchableOpacity */}
+        <View style={styles.section}>
+          <Text style={styles.title}>2. TouchableOpacity</Text>
+          <TouchableOpacity
+            style={[styles.btn, { backgroundColor: '#28a745' }]}
+            onPress={() => Alert.alert('TouchableOpacity')}
+          >
+            <Text style={styles.btnText}>TouchableOpacity</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* 🔘 Botón 3: TouchableHighlight */}
+        <View style={styles.section}>
+          <Text style={styles.title}>3. TouchableHighlight</Text>
+          <TouchableHighlight
+            style={[styles.btn, { backgroundColor: '#ffc107' }]}
+            underlayColor="#e0a800"
+            onPress={() => Alert.alert('Botón 3')}
+          >
+            <Text style={styles.btnText}>TouchableHighlight</Text>
+          </TouchableHighlight>
+        </View>
+
+        {/* 🔘 Botón 4: TouchableWithoutFeedback */}
+        <View style={styles.section}>
+          <Text style={styles.title}>4. Sin Retroalimentación Visual</Text>
+          <TouchableWithoutFeedback onPress={() => Alert.alert('¡Sin retroalimentación visual!')}>
+            <View style={[styles.btn, { backgroundColor: '#17a2b8' }]}>
+              <Text style={styles.btnText}>Sin retroalimentación</Text>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+
+        {/* 🔘 Botón 5: Pressable */}
+        <View style={styles.section}>
+          <Text style={styles.title}>5. Pressable (Presionado)</Text>
+          <Pressable
+            style={({ pressed }) => [
+              styles.btn,
+              { backgroundColor: pressed ? '#6c757d' : '#343a40' },
+            ]}
+            onPress={() => Alert.alert('¡Presionaste Pressable!')}
+          >
+            <Text style={styles.btnText}>Pressable</Text>
+          </Pressable>
+        </View>
+
+        {/* 🔘 Botón 6: Button de React Native Paper */}
+        <View style={styles.section}>
+          <Text style={styles.title}>6. Botón de Paper</Text>
+          <ButtonPaper
+            mode="contained"
+            buttonColor="#9c27b0"
+            textColor="#fff"
+            onPress={() => Alert.alert('¡Presionaste el botón de Paper!')}
+            style={styles.paperButton}
+          >
+            Botón de Papel
+          </ButtonPaper>
+        </View>
+
+        {/* 🔘 Botón 7: Button de React Native Elements */}
+        <View style={styles.section}>
+          <Text style={styles.title}>7. Botón de Elements</Text>
+          <ButtonElements
+            title="Botón Elements"
+            onPress={() => Alert.alert('¡Presionaste el botón de Elements!')}
+            buttonStyle={{
+              backgroundColor: '#ff5722',
+              borderRadius: 10,
+              padding: 10,
+            }}
+            titleStyle={{ fontWeight: 'bold', fontSize: 16 }}
+          />
+        </View>
+
+        {/* Barra de estado superior */}
+        <StatusBar style="auto" />
       </ScrollView>
     </ProveedorPaper>
   );
 }
-// ESTILOS DEFINIDOS CON StyleSheet
+// 🔹 Zona 3: Estilos con StyleSheet
 
 const styles = StyleSheet.create({
-  // Contenedor principal de la pantalla
+  // Contenedor base
   container: {
-    flex: 1, // Ocupa todo el alto de la pantalla
-    alignItems: 'center', // Centra los elementos horizontalmente
-    justifyContent: 'center', // Centra los elementos verticalmente
-    paddingHorizontal: 16, // Espacio lateral interno
-    paddingBottom: 50 // Espacio inferior
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 50,
   },
 
-  // Estilo base del texto
-  Text: {
-    color: 'white', // Color de texto blanco
-    fontSize: 27,   // Texto grande
-    textAlign: 'center', // Centrado horizontal
-    marginVertical: 10,  // Espaciado arriba y abajo
-    padding: 10          // Espaciado interno
-  },
-
-  // Estilo para cada fondo de color
-  azul: {
-    backgroundColor: 'blue' // Fondo azul
-  },
-  verde: {
-    backgroundColor: 'green' // Fondo verde
-  },
-  negro: {
-    backgroundColor: 'black' // Fondo negro
-  },
-
-  // Estilo para el título "Modo de pantalla: Oscuro/Claro"
+  // Estilo general para el título
   title: {
     fontSize: 16,
     marginVertical: 6,
-    textAlign: 'center'
-    // El color se modifica desde el componente App usando ternario
+    textAlign: 'center',
+    color: '#000',
   },
 
-  // Estilo para el contenedor del ScrollView
+  // Contenedor de cada sección (título + botón)
+  section: {
+    marginVertical: 15,
+    alignItems: 'center',
+    width: '100%',
+  },
+
+  // Estilo base para botones personalizados
+  btn: {
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 5,
+    width: 220,
+  },
+
+  // Estilo del texto dentro de los botones personalizados
+  btnText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+
+  // Estilo del botón de Paper
+  paperButton: {
+    marginTop: 5,
+    width: 220,
+  },
+
+  // Contenedor para scroll
   ScrollContainer: {
-    paddingVertical: 20 // Espacio vertical general del contenido scrollable
-  }
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
 });
+
