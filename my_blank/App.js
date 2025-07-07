@@ -1,283 +1,174 @@
-// ✅ Zona 1: IMPORTACIONES
+// ✅ Zona 1: IMPORTACIONES NECESARIAS
 
-// React y el hook useState para controlar los valores ingresados y estados internos
+// React y useState para manejar valores de campos y switches
 import React, { useState } from 'react';
 
-// Componentes principales de React Native
+// Componentes principales de la interfaz de usuario
 import {
-  StyleSheet,        // Para crear estilos
-  Text,              // Mostrar texto en pantalla
-  View,              // Contenedor de elementos
-  ScrollView,        // Hacer scroll si hay muchos elementos
-  StatusBar,         // Barra de estado del sistema
-  TextInput,         // Campos de entrada
-  Button,            // Botones nativos
-  Switch,            // Interruptor tipo ON/OFF
-  Alert              // Para mostrar ventanas emergentes
+  StatusBar,              // Controla el estilo de la barra de estado del sistema
+  StyleSheet,             // Para definir estilos personalizados
+  Text,                   // Para mostrar texto
+  View,                   // Contenedor flexible de elementos
+  TextInput,              // Campo de entrada de texto
+  Switch,                 // Componente de activación tipo ON/OFF
+  Alert,                  // Para mostrar alertas emergentes
+  Image,                  // Para mostrar imágenes estáticas
+  TouchableOpacity,       // Componente que responde al toque con opacidad
+  ImageBackground,        // Imagen de fondo que envuelve todo el contenido
+  ScrollView              // Permite hacer scroll si el contenido es largo
 } from 'react-native';
 
-// Botón y proveedor visual de la librería react-native-paper (estética moderna)
-import { Provider as ProveedorPaper, Button as ButtonPaper } from 'react-native-paper';
-
-// Botón de la librería react-native-elements (personalización e iconos)
-import { Button as ButtonElements } from 'react-native-elements';
-// ✅ Zona 2: COMPONENTE PRINCIPAL
+// Carga de imágenes locales
+const logo = require('./assets/logo.jpeg');        // Imagen de logo que se muestra arriba
+const background = require('./assets/fondo1.jpeg'); // Imagen que se usa como fondo de pantalla
+// ✅ COMPONENTE PRINCIPAL
 
 export default function App() {
-  // 🔁 Estado para controlar el modo oscuro (ON/OFF)
-  const [modoOscuro, setModoOscuro] = useState(false);
+  // 🎯 Estados controlados con useState
+  const [nombre, setNombre] = useState('');               // Guarda el nombre ingresado
+  const [correo, setCorreo] = useState('');               // Guarda el correo ingresado
+  const [aceptarTerminos, setAceptarTerminos] = useState(false); // Switch ON/OFF para aceptar términos
 
-  // 🔄 Función que invierte el valor de modoOscuro (true/false)
-  const alternarModoOscuro = () => setModoOscuro(previo => !previo);
-
-  // 🧠 Estados para cada campo de entrada
-  const [emailText, setEmailText] = useState('');
-  const [defaultText, onChangeDefault] = useState('');
-  const [numberPadText, setNumberPadText] = useState('');
-  const [decimalPadText, setDecimalPadText] = useState('');
-  const [numericText, setNumericText] = useState('');
-  const [phoneText, setPhoneText] = useState('');
-  const [urlText, setUrlText] = useState('');
-  const [visiblePassword, setVisiblePassword] = useState('');
-  // ✅ VALIDACIONES USANDO REGEX (expresiones regulares)
-
-  // Valida si el texto es un correo electrónico válido
+  // ✅ VALIDACIÓN DE FORMATO DE CORREO USANDO REGEX
   const isValidEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); // RegEx que valida el formato correcto de email
+  // 🔔 FUNCIÓN QUE SE EJECUTA AL PRESIONAR "Registrarse"
+  const handleRegistro = () => {
+    // Valida que los campos no estén vacíos
+    if (nombre === '' || correo === '') {
+      Alert.alert('Error', 'No puede haber campos vacíos');
+      return;
+    }
 
-  // Valida si el texto es un número de teléfono entre 7 y 15 dígitos
-  const isValidPhone = (phone) =>
-    /^[0-9]{7,15}$/.test(phone);
+    // Valida que el correo tenga un formato válido
+    if (!isValidEmail(correo)) {
+      Alert.alert('Error', 'Correo electrónico inválido');
+      return;
+    }
 
-  // Valida si el texto es una URL válida
-  const isValidUrl = (url) =>
-    /^(https?:\/\/)?([\w.-]+)\.([a-z]{2,6})(\/[\w.-]*)*\/?$/.test(url);
+    // Valida que el usuario haya aceptado los términos
+    if (!aceptarTerminos) {
+      Alert.alert('Error', 'Debes aceptar los términos y condiciones');
+      return;
+    }
 
-  // Valida si el texto solo contiene números enteros
-  const isNumeric = (value) =>
-    /^[0-9]+$/.test(value);
-
-  // Valida si el texto contiene números decimales
-  const isDecimal = (value) =>
-    /^[0-9]*\.?[0-9]+$/.test(value);
-  // ✅ FUNCIONES DE ALERTA
-
-  // Alerta simple con un mensaje
-  const AlertaBasica = () => {
-    Alert.alert('Alerta Básica', '¡Hola, este es un mensaje de alerta!');
+    // Si todo está correcto, muestra mensaje de éxito
+    Alert.alert('Registro exitoso', `Nombre: ${nombre}\nCorreo: ${correo}`);
   };
-
-  // Alerta con botones de confirmación
-  const AlertaConfirmacion = () => {
-    Alert.alert(
-      '¿Gus es Gustavo?',
-      'Confirma tu respuesta',
-      [
-        { text: 'No', onPress: () => Alert.alert('No es cierto') },
-        { text: 'Sí', onPress: () => Alert.alert('Exactamente') }
-      ]
-    );
-  };
-
-  // Alerta con entrada de texto (solo en iOS funciona `Alert.prompt`)
-  const AlertTexto = () => {
-    Alert.prompt(
-      '¿Erick está aquí?',
-      'Escribe tu respuesta',
-      text => Alert.alert('Exactamente, ' + text)
-    );
-  };
-
-  // Alerta que evalúa un valor ingresado (edad)
-  const AlertCondicional = () => {
-    Alert.prompt('¿Qué edad tienes?', '', input => {
-      const edad = parseInt(input);
-      if (edad >= 1 && edad <= 70) {
-        Alert.alert('Tu edad es: ' + edad);
-      } else {
-        Alert.alert('Edad no válida');
-      }
-    });
-  };
-
-  // Alerta que aparece después de 5 segundos
-  const alertaTiempo = () => {
-    setTimeout(() => {
-      Alert.alert('Alerta después de 5 segundos');
-    }, 5000);
-  };
-  // ✅ RENDERIZADO DE LA INTERFAZ
-
+  // ✅ RETORNO DE LA INTERFAZ
   return (
-    <ProveedorPaper>
-      {/* ScrollView permite desplazarse si el contenido excede la pantalla */}
+    // Componente de fondo con imagen
+    <ImageBackground source={background} style={styles.background}>
+      
+      {/* Contenedor scrollable para evitar desbordamientos */}
       <ScrollView contentContainerStyle={styles.container}>
+        
+        {/* Imagen del logo superior */}
+        <Image source={logo} style={styles.logo} />
 
-        {/* 🔘 SWITCH DE MODO OSCURO */}
-        <View style={[styles.section, { backgroundColor: modoOscuro ? '#111' : '#fff' }]}>
-          <Text style={[styles.title, { color: modoOscuro ? '#fff' : '#000' }]}>
-            Modo de pantalla: {modoOscuro ? 'Oscuro' : 'Claro'}
-          </Text>
-          <Switch value={modoOscuro} onValueChange={alternarModoOscuro} />
+        {/* Campo de entrada para el nombre */}
+        <Text style={styles.label}>Nombre:</Text>
+        <TextInput
+          style={styles.Input}
+          placeholder='Ingresa nombre'
+          value={nombre}
+          onChangeText={setNombre}
+        />
+
+        {/* Campo de entrada para correo */}
+        <Text style={styles.label}>Correo Electrónico:</Text>
+        <TextInput
+          style={styles.Input}
+          placeholder='Ingresa correo'
+          value={correo}
+          onChangeText={setCorreo}
+        />
+
+        {/* Switch de aceptación de términos */}
+        <View style={styles.SwitchContainer}>
+          <Switch value={aceptarTerminos} onValueChange={setAceptarTerminos} />
+          <Text style={styles.switchLabel}>Acepto los términos y condiciones</Text>
         </View>
-        {/* 🧾 CAMPOS DE TEXTO */}
 
-        {/* Campo de correo electrónico con validación */}
-        <Text style={styles.label}>Correo electrónico:</Text>
-        <TextInput
-          style={[
-            styles.input,
-            !isValidEmail(emailText) && emailText ? styles.errorInput : null
-          ]}
-          placeholder="ejemplo@correo.com"
-          value={emailText}
-          onChangeText={setEmailText}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        {!isValidEmail(emailText) && emailText !== '' && (
-          <Text style={styles.errorText}>Correo inválido</Text>
-        )}
+        {/* Botón de registro */}
+        <TouchableOpacity style={styles.button} onPress={handleRegistro}>
+          <Text style={styles.buttonText}>Registrarse</Text>
+        </TouchableOpacity>
 
-        {/* Campo default (texto libre) */}
-        <Text style={styles.label}>Texto libre:</Text>
-        <TextInput
-          style={styles.input}
-          value={defaultText}
-          onChangeText={onChangeDefault}
-          placeholder="Escribe texto"
-          keyboardType="default"
-        />
-
-        {/* Campo numérico (solo números enteros) */}
-        <Text style={styles.label}>Solo números (number-pad):</Text>
-        <TextInput
-          style={styles.input}
-          value={numberPadText}
-          onChangeText={text => {
-            if (isNumeric(text) || text === '') setNumberPadText(text);
-          }}
-          keyboardType="number-pad"
-        />
-
-        {/* Campo decimal */}
-        <Text style={styles.label}>Números decimales (decimal-pad):</Text>
-        <TextInput
-          style={styles.input}
-          value={decimalPadText}
-          onChangeText={text => {
-            if (isDecimal(text) || text === '') setDecimalPadText(text);
-          }}
-          keyboardType="decimal-pad"
-        />
-
-        {/* Campo numérico general */}
-        <Text style={styles.label}>Números (numeric):</Text>
-        <TextInput
-          style={styles.input}
-          value={numericText}
-          onChangeText={text => {
-            if (isNumeric(text) || text === '') setNumericText(text);
-          }}
-          keyboardType="numeric"
-        />
-
-        {/* Teléfono con validación */}
-        <Text style={styles.label}>Teléfono:</Text>
-        <TextInput
-          style={[
-            styles.input,
-            !isValidPhone(phoneText) && phoneText ? styles.errorInput : null
-          ]}
-          value={phoneText}
-          onChangeText={setPhoneText}
-          placeholder="Ej: 5533221144"
-          keyboardType="phone-pad"
-        />
-        {!isValidPhone(phoneText) && phoneText !== '' && (
-          <Text style={styles.errorText}>Teléfono inválido</Text>
-        )}
-
-        {/* URL con validación */}
-        <Text style={styles.label}>URL:</Text>
-        <TextInput
-          style={[
-            styles.input,
-            !isValidUrl(urlText) && urlText ? styles.errorInput : null
-          ]}
-          value={urlText}
-          onChangeText={setUrlText}
-          placeholder="https://misitio.com"
-          keyboardType="url"
-          autoCapitalize="none"
-        />
-        {!isValidUrl(urlText) && urlText !== '' && (
-          <Text style={styles.errorText}>URL inválida</Text>
-        )}
-
-        {/* Contraseña visible */}
-        <Text style={styles.label}>Contraseña (visible):</Text>
-        <TextInput
-          style={styles.input}
-          value={visiblePassword}
-          onChangeText={setVisiblePassword}
-          placeholder="Contraseña"
-          keyboardType="visible-password"
-          secureTextEntry={false}
-          autoCapitalize="none"
-        />
-        {/* ✅ BOTONES PARA ALERTAS */}
-        <Button title="Alerta Básica" onPress={AlertaBasica} />
-        <Button title="Alerta de Confirmación" onPress={AlertaConfirmacion} />
-        <Button title="Alerta con Texto" onPress={AlertTexto} />
-        <Button title="Alerta Condicional (edad)" onPress={AlertCondicional} />
-        <Button title="Alerta con tiempo (5s)" onPress={alertaTiempo} />
-
+        {/* Barra de estado superior */}
         <StatusBar style="auto" />
       </ScrollView>
-    </ProveedorPaper>
+    </ImageBackground>
   );
 }
-// ✅ Zona 3: ESTILOS
-
 const styles = StyleSheet.create({
+  // Estilo de fondo con imagen que cubre toda la pantalla
+  background: {
+    flex: 1,
+    resizeMode: 'cover', // Ajusta imagen al tamaño
+  },
+
+  // Estilo del contenedor principal
   container: {
-    flexGrow: 1,             // Permite que ScrollView se expanda
-    padding: 20,             // Espacio interno general
-    backgroundColor: '#f4f4f4',
+    flexGrow: 1,
+    alignItems: 'center',         // Centra horizontalmente
+    justifyContent: 'center',     // Centra verticalmente
+    paddingVertical: 40,          // Espaciado superior e inferior
   },
-  section: {
+
+  // Estilo de la imagen del logo
+  logo: {
+    width: 100,
+    height: 100,
     marginBottom: 20,
-    padding: 20,
-    alignItems: 'center',
-    borderRadius: 10,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
+
+  // Estilo del texto de las etiquetas (Nombre, Correo, etc.)
   label: {
-    fontWeight: 'bold',
-    marginTop: 12,
-    marginBottom: 4,
-    color: '#333',
+    fontSize: 18,
+    marginBottom: 10,
+    color: '#fff',
   },
-  input: {
+
+  // Estilo del campo de texto
+  Input: {
+    width: '80%',
     height: 40,
-    borderColor: '#aaa',
+    borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginBottom: 6,
+    marginBottom: 20,
     backgroundColor: '#fff',
   },
-  errorInput: {
-    borderColor: 'red',
+
+  // Contenedor del switch y su texto
+  SwitchContainer: {
+    flexDirection: 'row',         // Elementos en fila
+    alignItems: 'center',
+    marginBottom: 20,
   },
-  errorText: {
-    color: 'red',
-    fontSize: 12,
-    marginBottom: 6,
+
+  // Estilo del texto al lado del switch
+  switchLabel: {
+    marginLeft: 10,
+    fontSize: 16,
+    color: '#fff',
+  },
+
+  // Estilo del botón de registro
+  button: {
+    backgroundColor: '#007BFF',   // Azul brillante
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    width: '80%',
+    marginBottom: 20,
+  },
+
+  // Texto dentro del botón
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
   },
 });
