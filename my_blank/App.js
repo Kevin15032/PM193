@@ -1,106 +1,92 @@
-// ✅ Importaciones necesarias
-import React, { useEffect, useState } from 'react';
+// Importamos React para poder usar JSX y crear componentes funcionales
+// useState es un "hook" que nos permite manejar el estado de los componentes (si algo se muestra o no)
+import React, { useState } from 'react';
+
+// Importamos componentes de la librería 'react-native' que usaremos en la interfaz
 import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  ActivityIndicator,
-  SafeAreaView,
-  StatusBar,
+  Modal,        // Componente que permite mostrar una ventana emergente (como un popup)
+  View,         // Contenedor visual, como un div en HTML
+  Text,         // Para mostrar textos en pantalla
+  StyleSheet,   // Herramienta para crear estilos de forma organizada
+  Button,       // Botón básico que ya viene con diseño
+  Pressable     // Botón más flexible y personalizable en diseño
 } from 'react-native';
-// ✅ Componente principal
-const App = () => {
+// Creamos el componente principal de la app, que será exportado para mostrarse en pantalla
+export default function App() {
+  // Definimos una variable de estado llamada modalVisible, que por defecto es "false"
+  // Esta variable sirve para saber si el modal está abierto (true) o cerrado (false)
+  const [modalVisible, setModalVisible] = useState(false);
+  // Esta función se ejecuta cuando queremos abrir el modal (al presionar el botón)
+  const handleOpenModal = () => {
+    setModalVisible(true); // Cambiamos el estado a "true", así el modal se mostrará
+  };
 
-  // Estado para saber si está cargando o ya se descargaron los datos
-  const [loading, setLoading] = useState(true);
-
-  // Estado para guardar los usuarios descargados
-  const [users, setUsers] = useState([]);
-
-  // ✅ useEffect: se ejecuta una vez al montar el componente
-  useEffect(() => {
-    // Simulamos un tiempo de espera (2 segundos) antes de hacer fetch
-    setTimeout(() => {
-      fetch('https://jsonplaceholder.typicode.com/users') // API falsa para pruebas
-        .then(resp => resp.json())
-        .then(data => {
-          setUsers(data);      // Guardamos los usuarios
-          setLoading(false);   // Quitamos el indicador de carga
-        })
-        .catch(err => {
-          console.error('Error al cargar usuarios: ', err);
-          setLoading(false);   // Quitamos el loading si hay error
-        });
-    }, 2000);
-  }, []);
-  // ✅ Render individual de cada usuario en la lista
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.name}> {item.name} </Text>
-      <Text style={styles.text}> {item.email} </Text>
-      <Text style={styles.text}> {item.address.city} </Text>
-      <Text style={styles.text}> {item.company.name} </Text>
+  // Esta función se ejecuta para cerrar el modal (cuando presionamos "Cerrar")
+  const handleCloseModal = () => {
+    setModalVisible(false); // Cambiamos el estado a "false", así el modal se ocultará
+  };
+  return (
+    <View style={styles.container}>
+      {/* Botón básico. Cuando se presiona, se ejecuta la función handleOpenModal */}
+      <Button title="Mostrar Modal" onPress={handleOpenModal} />
+      {/* Modal: ventana emergente que aparece encima del contenido */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleCloseModal}
+        onShow={() => console.log("Modal mostrado")}
+        onDismiss={() => console.log("Modal cerrado")}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>¡Este es el contenido del modal!</Text>
+            <Pressable style={styles.buttonClose} onPress={handleCloseModal}>
+              <Text style={styles.textStyle}>Cerrar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
-  // ✅ Interfaz principal
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+}
 
-      {/* Si está cargando, mostramos el ActivityIndicator */}
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007bff" />
-          <Text style={styles.loadingText}>Cargando usuarios...</Text>
-        </View>
-      ) : (
-        // Si ya cargó, mostramos la lista
-        <FlatList
-          data={users}                           // Lista de usuarios
-          keyExtractor={item => item.id.toString()}  // Clave única para cada elemento
-          renderItem={renderItem}               // Qué renderizar por cada ítem
-          contentContainerStyle={styles.list}   // Estilo de la lista
-        />
-      )}
-    </SafeAreaView>
-  );
-};
 
+// Creamos un objeto con estilos usando StyleSheet.create
 const styles = StyleSheet.create({
   container: {
-    flex: 1,                        // Ocupa todo el alto de la pantalla
-    paddingTop: StatusBar.currentHeight || 0,
-    padding: 16,
-    backgroundColor: '#fff',
+    flex: 1,                    // El contenedor ocupa toda la pantalla
+    justifyContent: 'center',  // Centrado vertical
+    alignItems: 'center',      // Centrado horizontal
   },
-  loadingContainer: {
-    flex: 1,                        // Centrar vertical
-    justifyContent: 'center',
-    alignItems: 'center',
+  centeredView: {
+    flex: 1,                                 // Ocupa todo el espacio disponible
+    justifyContent: 'center',               // Centra el contenido verticalmente
+    alignItems: 'center',                   // Centra el contenido horizontalmente
+    backgroundColor: 'rgba(0,0,0,0.5)',     // Fondo negro con transparencia (0.5)
   },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#333',
+  modalView: {
+    margin: 20,                  // Espacio entre el modal y el borde de la pantalla
+    backgroundColor: 'white',   // Fondo blanco
+    borderRadius: 20,           // Bordes redondeados
+    padding: 35,                // Espacio interno del cuadro
+    alignItems: 'center',       // Centra su contenido horizontalmente
+    elevation: 5,               // Sombra (solo para Android)
   },
-  list: {
-    paddingBottom: 20,
+  modalText: {
+    marginBottom: 15,           // Espacio debajo del texto
+    textAlign: 'center',        // Centrado
+    fontSize: 18,               // Tamaño de letra más grande
   },
-  card: {
-    backgroundColor: '#f0f0f0',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 10,
-    elevation: 2, // sombra en Android
+  buttonClose: {
+    backgroundColor: '#2196F3', // Azul
+    borderRadius: 10,           // Bordes redondeados
+    padding: 10,                // Espaciado interno del botón
+    elevation: 2,               // Sombra para que parezca elevado
   },
-  name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  text: {
-    fontSize: 14,
-    color: '#333',
-    marginTop: 2,
+  textStyle: {
+    color: 'white',             // Texto blanco para que contraste con el azul
+    fontWeight: 'bold',         // Negrita
+    textAlign: 'center',        // Centrado horizontal
   },
 });
